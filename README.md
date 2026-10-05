@@ -1,6 +1,7 @@
 # Budget
 
 Personal budget and net-worth tracker. Single static file, no server, no account.
+**[Open the app](https://aprevitali.github.io/budget-app/)** · your data stays in your browser
 
 ## Run
 Open `index.html` in a browser. Data is stored in that browser's localStorage.
