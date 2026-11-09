@@ -21,6 +21,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data: blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <title>Budget</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Manrope:wght@400;600&family=Fraunces:wght@500;700&family=Silkscreen:wght@400;700&family=Orbitron:wght@600;800&display=swap">
 <style>
@@ -116,9 +117,9 @@ option:checked{background-color:var(--acc);color:var(--bg)}
 </style>
 </head>
 <body>
-<header class="bar"><span class="logo">budget</span><div class="r"><select id="month" aria-label="Mese"></select>
-<details class="menu"><summary>Dati</summary><div><select id="lang" aria-label="Language / Lingua"><option value="en">English</option><option value="it">Italiano</option></select><select id="theme" aria-label="Tema"><option value="nebula">Tema Nebula</option><option value="terminal">Tema Terminal</option><option value="aurora">Tema Aurora</option><option value="foresta">Tema Foresta</option><option value="voxel">Tema Voxel</option><option value="synthwave">Tema Synthwave</option><option value="carta">Tema Carta</option></select><button class="p" id="imp">Importa CSV</button><button id="demo">Dati di esempio</button><button id="exp">Esporta dati</button><button id="imd">Importa dati</button><button id="fresh">Ricomincia da zero</button><a id="src" class="srcl" target="_blank" rel="noopener">Codice sorgente (AGPL-3.0)</a></div></details></div>
-<input type="file" id="file" accept=".csv,text/csv" hidden><input type="file" id="fj" accept=".json" hidden></header>
+<header class="bar"><span class="logo">budget</span><div class="r"><select id="month" aria-label="Mese"></select><button id="addm" title="Aggiungi mese" aria-label="Aggiungi mese">+</button><button id="delm" title="Elimina mese" aria-label="Elimina mese">−</button><input type="month" id="mpick" tabindex="-1" aria-hidden="true" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none">
+<details class="menu"><summary>Dati</summary><div><select id="lang" aria-label="Language / Lingua"><option value="en">English</option><option value="it">Italiano</option></select><select id="theme" aria-label="Tema"><option value="nebula">Tema Nebula</option><option value="terminal">Tema Terminal</option><option value="aurora">Tema Aurora</option><option value="foresta">Tema Foresta</option><option value="voxel">Tema Voxel</option><option value="synthwave">Tema Synthwave</option><option value="carta">Tema Carta</option></select><button class="p" id="imp">Importa CSV</button><button id="demo">Dati di esempio</button><button id="exp">Esporta dati</button><button id="imd">Importa dati</button><button id="pw">Proteggi con password</button><button id="lk">Blocca ora</button><button id="pv">Nascondi importi</button><button id="fresh">Ricomincia da zero</button><a id="src" class="srcl" target="_blank" rel="noopener">Codice sorgente (AGPL-3.0)</a></div></details></div>
+<input type="file" id="file" accept=".csv,text/csv" multiple hidden><input type="file" id="fj" accept=".json" hidden></header>
 <nav class="dots" aria-label="Sezioni"><a href="#s1" aria-label="Oggi"></a><a href="#s2" aria-label="Entrate e spese"></a><a href="#s3" aria-label="Dove sono i soldi"></a><a href="#s4" aria-label="Cassetti"></a><a href="#s5" aria-label="Chiusura del mese"></a><a href="#s6" aria-label="Movimenti"></a><a href="#s7" aria-label="Livello"></a></nav>
 <main>
 <section class="scene" id="s1"><div id="hero"></div></section>
@@ -146,10 +147,11 @@ const OUT=["Giroconto"],INV=["Investimenti"];
 const LS="budget_v1";
 const SOURCE_URL="https://github.com/aprevitali/budget-app"; // change if your repository has another URL
 let S={tx:[],goals:[{n:"Emergency fund",target:5000,saved:0},{n:"Car (down payment)",target:10000,saved:0},{n:"Home (furnishing)",target:3000,saved:0}],thr:70,inv:false,m:"",rules:{},acc:[{n:"Main account",t:"Liquidità"},{n:"Deposit account",t:"Deposito"},{n:"Investments",t:"Investimenti"},{n:"Pension fund",t:"Fondo pensione"}],bal:{},sum:{}};
-try{const r=localStorage.getItem(LS);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+let KEY=null,SALT=null,LOCKED=false,SQ=0,BAD=0;
+try{if(localStorage.getItem(LS+"_enc"))LOCKED=true;else{const r=localStorage.getItem(LS);if(r)S=Object.assign(S,JSON.parse(r));clean()}}catch(e){}
 const L=(e,i)=>S.lang==="it"?i:e;
 const LOC=()=>S.lang==="it"?"it-IT":"en-GB";
-const EN={"Dati":"Data","Dati di esempio":"Sample data","Importa CSV":"Import CSV","Esporta dati":"Export data","Importa dati":"Import data","Tema Nebula":"Nebula theme","Tema Terminal":"Terminal theme","Tema Aurora":"Aurora theme","Tema Foresta":"Forest theme","Tema Voxel":"Voxel theme","Tema Synthwave":"Synthwave theme","Tema Carta":"Paper theme","Entrate e spese":"Income & spending","Dove sono i soldi":"Where your money is","Cassetti":"Buckets","Chiusura del mese":"Month close","Dettaglio spese":"Spending details","Livello":"Level","delle entrate speso":"of income spent","Entrate":"Income","Uscite":"Spending","Risparmio":"Savings","Conta gli investimenti come spesa":"Count investments as spending","Aggiungi movimento":"Add transaction","Aggiungi conto":"Add account","Aggiungi cassetto":"Add bucket","Elimina":"Delete","Messo da parte":"Saved","Patrimonio":"Net worth","Rispetto al mese prima":"vs previous month","Barra chiara: entrate. Barra colorata: spese, con la percentuale sulle entrate.":"Light bar: income. Colored bar: spending, with its % of income.","Nessuna spesa da mostrare.":"No spending to show.","Inserisci i saldi di questo mese per vedere come cambia il patrimonio.":"Enter this month's balances to see how your net worth changes.","Liquidità":"Cash","Deposito":"Deposit","Investimenti":"Investments","Fondo pensione":"Pension fund","Altro":"Other","Giroconto":"Transfer","Casa":"Home","Spesa":"Groceries","Trasporti":"Transport","Ristoranti":"Dining","Abbonamenti":"Subscriptions","Novizio":"Rookie","Risparmiatore":"Saver","Stratega":"Strategist","Architetto":"Architect","Maestro":"Master","Leggenda":"Legend","Prima chiusura":"First close","Hai chiuso un mese con i saldi":"You closed a month with balances","Sotto soglia":"Under threshold","Un mese sotto la soglia di spesa":"One month under your spending threshold","Serie da 3":"3-month streak","3 mesi di fila sotto soglia":"3 months in a row under threshold","Risparmio 40%":"40% saved","Un mese con almeno il 40% risparmiato":"A month with at least 40% saved","Mezzo cassetto":"Half a bucket","Un cassetto a metà strada":"A bucket halfway full","Cassetto pieno":"Bucket full","Un cassetto completato":"A completed bucket","Patrimonio +10%":"Net worth +10%","Patrimonio cresciuto del 10%":"Net worth grew by 10%","Andamento del patrimonio":"Net worth trend","Apri la riga di comando":"Open command line","Avanzamento livello":"Level progress","Categoria":"Category","Data":"Date","Descrizione":"Description","Importo":"Amount","Importo o calcolo (− uscita)":"Amount or calculation (− for spending)","Mese":"Month","Nome cassetto":"Bucket name","Nome conto":"Account name","Oggi":"Today","Riga di comando":"Command line","Ripartizione del patrimonio":"Net worth breakdown","Sezioni":"Sections","Tema":"Theme","Tipo conto":"Account type","Uscite del mese":"Month's spending","Entrate del mese":"Month's income","Entrate e spese per mese":"Income and spending by month","Soglia di spesa (% delle entrate)":"Spending threshold (% of income)","Soglia di spesa":"Spending threshold","Codice sorgente (AGPL-3.0)":"Source code (AGPL-3.0)","Movimenti":"Transactions","Spese per categoria":"Spending by category","Tutti i movimenti":"All transactions","Ricomincia da zero":"Start from scratch","Sposta (trascina o usa le frecce su/giù)":"Move (drag, or use the up/down arrows)"};
+const EN={"Elimina mese":"Delete month","Aggiungi mese":"Add month","Elimina movimento":"Delete transaction","Proteggi con password":"Protect with password","Rimuovi password":"Remove password","Blocca ora":"Lock now","Nascondi importi":"Hide amounts","Dati":"Data","Dati di esempio":"Sample data","Importa CSV":"Import CSV","Esporta dati":"Export data","Importa dati":"Import data","Tema Nebula":"Nebula theme","Tema Terminal":"Terminal theme","Tema Aurora":"Aurora theme","Tema Foresta":"Forest theme","Tema Voxel":"Voxel theme","Tema Synthwave":"Synthwave theme","Tema Carta":"Paper theme","Entrate e spese":"Income & spending","Dove sono i soldi":"Where your money is","Cassetti":"Buckets","Chiusura del mese":"Month close","Dettaglio spese":"Spending details","Livello":"Level","delle entrate speso":"of income spent","Entrate":"Income","Uscite":"Spending","Risparmio":"Savings","Conta gli investimenti come spesa":"Count investments as spending","Aggiungi movimento":"Add transaction","Aggiungi conto":"Add account","Aggiungi cassetto":"Add bucket","Elimina":"Delete","Messo da parte":"Saved","Patrimonio":"Net worth","Rispetto al mese prima":"vs previous month","Barra chiara: entrate. Barra colorata: spese, con la percentuale sulle entrate.":"Light bar: income. Colored bar: spending, with its % of income.","Nessuna spesa da mostrare.":"No spending to show.","Inserisci i saldi di questo mese per vedere come cambia il patrimonio.":"Enter this month's balances to see how your net worth changes.","Liquidità":"Cash","Deposito":"Deposit","Investimenti":"Investments","Fondo pensione":"Pension fund","Altro":"Other","Giroconto":"Transfer","Casa":"Home","Spesa":"Groceries","Trasporti":"Transport","Ristoranti":"Dining","Abbonamenti":"Subscriptions","Novizio":"Rookie","Risparmiatore":"Saver","Stratega":"Strategist","Architetto":"Architect","Maestro":"Master","Leggenda":"Legend","Prima chiusura":"First close","Hai chiuso un mese con i saldi":"You closed a month with balances","Sotto soglia":"Under threshold","Un mese sotto la soglia di spesa":"One month under your spending threshold","Serie da 3":"3-month streak","3 mesi di fila sotto soglia":"3 months in a row under threshold","Risparmio 40%":"40% saved","Un mese con almeno il 40% risparmiato":"A month with at least 40% saved","Mezzo cassetto":"Half a bucket","Un cassetto a metà strada":"A bucket halfway full","Cassetto pieno":"Bucket full","Un cassetto completato":"A completed bucket","Patrimonio +10%":"Net worth +10%","Patrimonio cresciuto del 10%":"Net worth grew by 10%","Andamento del patrimonio":"Net worth trend","Apri la riga di comando":"Open command line","Avanzamento livello":"Level progress","Categoria":"Category","Data":"Date","Descrizione":"Description","Importo":"Amount","Importo o calcolo (− uscita)":"Amount or calculation (− for spending)","Mese":"Month","Nome cassetto":"Bucket name","Nome conto":"Account name","Oggi":"Today","Riga di comando":"Command line","Ripartizione del patrimonio":"Net worth breakdown","Sezioni":"Sections","Tema":"Theme","Tipo conto":"Account type","Uscite del mese":"Month's spending","Entrate del mese":"Month's income","Entrate e spese per mese":"Income and spending by month","Soglia di spesa (% delle entrate)":"Spending threshold (% of income)","Soglia di spesa":"Spending threshold","Codice sorgente (AGPL-3.0)":"Source code (AGPL-3.0)","Movimenti":"Transactions","Spese per categoria":"Spending by category","Tutti i movimenti":"All transactions","Ricomincia da zero":"Start from scratch","Sposta (trascina o usa le frecce su/giù)":"Move (drag, or use the up/down arrows)"};
 const RX=[[/Nessun dato per questo mese\. Inserisci entrate e uscite in «Chiusura del mese», importa un CSV o carica i dati di esempio\./,"No data for this month. Enter income and spending in “Month close”, import a CSV or load the sample data."],[/Inserisci i saldi dei conti in «Chiusura del mese» per vedere come è distribuito il patrimonio\./,"Enter your account balances in “Month close” to see how your net worth is distributed."],[/Entrate e uscite del mese \(usate se non importi i movimenti\)\. Nei campi numerici puoi scrivere calcoli, ad esempio 1200\/12\+30\./,"Month's income and spending (used if you don't import transactions). Numeric fields accept calculations, e.g. 1200/12+30."],[/Soglia (\d+)%\./,"Threshold $1%."],[/Sei dentro la soglia\./,"You are within the threshold."],[/Hai superato la soglia di (\d+) punti\./,"You are $1 points over the threshold."],[/Servono delle entrate nel mese\./,"Income is needed for this month."],[/In media spendi il (\d+)% di quanto entra/,"On average you spend $1% of what comes in"],[/e metti da parte (.+?) al mese \((\d+) mesi con dati\)\./,"and set aside $1 a month ($2 months of data)."],[/Rispetto ai mesi precedenti il rapporto spese\/entrate è (migliorato|peggiorato) di (\d+) punti\./,(m,a,b)=>`Compared with earlier months, your spending/income ratio has ${a==="migliorato"?"improved":"worsened"} by ${b} points.`],[/Saldi a fine mese \((.+)\)/,"End-of-month balances ($1)"],[/Saldi di (.+)/,"Balances for $1"],[/(\d+)% · mancano (.+)/,"$1% · $2 to go"],[/Risparmio del mese (.+?); il resto \((.+?)\) viene da rendimenti, cambi di valore o movimenti non registrati\./,"Savings this month $1; the rest ($2) comes from returns, value changes or unrecorded transactions."],[/Stai costruendo valore:/,"You're building value:"],[/Il patrimonio sta calando:/,"Your net worth is shrinking:"],[/da (.+) è passato da (.+) a (.+) \((.+)\)\./,"from $1 it went from $2 to $3 ($4)."],[/(\d+) XP · (\d+) al livello (\d+)/,"$1 XP · $2 to level $3"],[/Serie attuale: (\d+) (?:mese|mesi) sotto soglia \(record (\d+)\)\./,"Current streak: $1 month(s) under threshold (best $2)."],[/Elimina (cassetto|conto) (.+)/,(m,a,b)=>`Delete ${a==="conto"?"account":"bucket"} ${b}`],[/Saldo di (.+)/,"Balance of $1"],[/Spendi il (.+?)% delle entrate, soglia (\d+)%/,"You spend $1% of income, threshold $2%"]];
 function tr(s){const k=s.trim();if(EN[k])return s.replace(k,EN[k]);if(k.endsWith(" · da sbloccare"))return s.replace(k,tr(k.slice(0,-15))+" · locked");let o=s;for(const[r,v]of RX)o=o.replace(r,v);return o}
 function applyLang(){
@@ -159,11 +161,19 @@ function applyLang(){
   document.querySelectorAll("[placeholder],[aria-label],[title]").forEach(el=>{for(const a of["placeholder","aria-label","title"]){if(!el.hasAttribute(a))continue;const k="it_"+a.replace("-","_");if(el.dataset[k]===undefined)el.dataset[k]=el.getAttribute(a);el.setAttribute(a,S.lang==="it"?el.dataset[k]:tr(el.dataset[k]))}});
   $("cpi").placeholder=L("spend 12.5 coffee  ·  help","spesa 12.5 caffè  ·  aiuto");
 }
-const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
+function clean(){const M=/^\d{4}-(0[1-9]|1[0-2])$/,D=/^\d{4}-(0[1-9]|1[0-2])-\d{2}$/;
+  const n0=Array.isArray(S.tx)?S.tx.length:0;S.tx=(Array.isArray(S.tx)?S.tx:[]).filter(x=>x&&typeof x.d==="string"&&D.test(x.d)&&isFinite(+x.a)).map(x=>Object.assign({},x,{id:String(x.id||Math.random()),t:String(x.t||"").slice(0,200),a:+x.a}));
+  for(const k of["bal","sum"]){const o=S[k]&&typeof S[k]==="object"?S[k]:{},r={};Object.keys(o).forEach(m=>{if(M.test(m))r[m]=o[m]});S[k]=r}
+  S.rules=Object.fromEntries(Object.entries(S.rules&&typeof S.rules==="object"?S.rules:{}).filter(([k,v])=>typeof v==="string"));
+  if(Array.isArray(S.goals))S.goals.forEach(g=>{g.n=String(g.n||"");g.saved=+g.saved||0;g.target=+g.target||0});
+  if(S.start&&!M.test(S.start))delete S.start;if(!M.test(S.m||""))S.m=new Date().toISOString().slice(0,7);return n0-S.tx.length}
+const LSE=LS+"_enc";
+const save=()=>{if(LOCKED)return;try{if(KEY)encSave();else localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
+async function encSave(){const q=++SQ,iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},KEY,new TextEncoder().encode(JSON.stringify(S))));if(q===SQ&&KEY)localStorage.setItem(LSE,JSON.stringify({s:b64(SALT),i:b64(iv),d:b64(ct)}))}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const eur=n=>n.toLocaleString(LOC(),{style:"currency",currency:"EUR",maximumFractionDigits:0});
-const eur2=n=>n.toLocaleString(LOC(),{style:"currency",currency:"EUR"});
+const eur=n=>S.priv?"•••":n.toLocaleString(LOC(),{style:"currency",currency:"EUR",maximumFractionDigits:0});
+const eur2=n=>S.priv?"•••":n.toLocaleString(LOC(),{style:"currency",currency:"EUR"});
 const guess=t=>CATS.find(c=>c[1].test(t))[0];
 const cat=x=>x.c||S.rules[x.t.toLowerCase()]||guess(x.t);
 
@@ -221,12 +231,13 @@ function render(){
 
   const sk=S.txSort||"date",fl=S.txFilter||"all";
   const rows=S.tx.map((x,i)=>[x,i]).filter(([x])=>x.d.startsWith(S.m)&&(fl==="all"||(fl==="in"?x.a>0:x.a<0)));
-  const row=([x,i])=>`<tr${sk==="category"?` draggable="true" data-ti="${i}"`:""}><td>${x.d.slice(8)}/${x.d.slice(5,7)}</td><td>${esc(x.t)}</td><td><select data-c="${i}" aria-label="Categoria">${CATS.map(c=>`<option value="${c[0]}"${c[0]===cat(x)?" selected":""}>${c[0]}</option>`).join("")}</select></td><td class="n" style="color:${x.a<0?"var(--ink)":"var(--ok)"}">${eur2(x.a)}</td></tr>`;
+  const row=([x,i])=>`<tr${sk==="category"?` draggable="true" data-ti="${i}"`:""}><td>${x.d.slice(8)}/${x.d.slice(5,7)}</td><td>${esc(x.t)}</td><td><select data-c="${i}" aria-label="Categoria">${CATS.map(c=>`<option value="${c[0]}"${c[0]===cat(x)?" selected":""}>${c[0]}</option>`).join("")}</select></td><td class="n" style="color:${x.a<0?"var(--ink)":"var(--ok)"}">${eur2(x.a)}<button data-x="${i}" title="Elimina movimento" aria-label="Elimina movimento" style="background:none;border:0;color:inherit;opacity:.55;cursor:pointer;font-size:1.05rem;margin-left:8px">×</button></td></tr>`;
   let th;
   if(sk==="category")th=CATS.map(c=>{const g=rows.filter(r=>cat(r[0])===c[0]).sort((a,b)=>b[0].d.localeCompare(a[0].d));return`<tr class="grp" data-cat="${c[0]}"><td colspan="3"><b>${c[0]}</b></td><td class="n">${eur(g.reduce((t,r)=>t+r[0].a,0))}</td></tr>`+g.map(row).join("")}).join("");
   else th=rows.sort(sk==="amount"?(a,b)=>Math.abs(b[0].a)-Math.abs(a[0].a):(a,b)=>b[0].d.localeCompare(a[0].d)).map(row).join("");
   $("tx").innerHTML=th;
   $("txc").innerHTML=`<div class="seg">${[["date",L("Date","Data")],["category",L("Category","Categoria")],["amount",L("Amount","Importo")]].map(o=>`<button data-ts="${o[0]}" aria-pressed="${sk===o[0]}">${o[1]}</button>`).join("")}</div><div class="seg">${[["all",L("All","Tutti")],["in",L("Income","Entrate")],["out",L("Spending","Uscite")]].map(o=>`<button data-tf="${o[0]}" aria-pressed="${fl===o[0]}">${o[1]}</button>`).join("")}</div>`+(sk==="category"?`<div class="mute" style="margin-bottom:8px">${L("Drag a row onto a category to move it (applies to every transaction with the same description).","Trascina una riga su una categoria per spostarla (vale per tutti i movimenti con la stessa descrizione).")}</div>`:"");
+  document.querySelectorAll("[data-x]").forEach(b=>b.onclick=()=>{const k=+b.dataset.x,x=S.tx[k];if(!x||!confirm(L(`Delete "${x.t}" (${eur2(x.a)})?`,`Eliminare "${x.t}" (${eur2(x.a)})?`)))return;S.tx.splice(k,1);if(!months().includes(S.m))S.m=months().pop();save();render()});
   document.querySelectorAll("[data-c]").forEach(s=>s.onchange=e=>{S.rules[S.tx[+s.dataset.c].t.toLowerCase()]=e.target.value;save();render()});
   document.querySelectorAll("[data-ts]").forEach(b=>b.onclick=()=>{S.txSort=b.dataset.ts;save();render()});
   document.querySelectorAll("[data-tf]").forEach(b=>b.onclick=()=>{S.txFilter=b.dataset.tf;save();render()});
@@ -279,16 +290,30 @@ function parseCSV(txt){
   lines.slice(1).forEach(l=>{const c=splitLine(l,d),da=dt(c[ci.d]||""),a=num(c[ci.a]);if(da&&!isNaN(a))out.push({id:Math.random().toString(36).slice(2),d:da,t:c[ci.t]||"",a})});
   return out;
 }
-function addTx(list){
-  const seen=new Set(S.tx.map(x=>x.d+x.t+x.a));
-  const fresh=list.filter(x=>!seen.has(x.d+x.t+x.a));
+function addTx(list,dd){
+  const n0=list.length;list=list.filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.d)&&isFinite(x.a)).map(x=>Object.assign(x,{t:String(x.t).slice(0,200)}));
+  BAD=n0-list.length;
+  let fresh=list;
+  if(dd){const k=x=>x.d+"|"+x.t+"|"+x.a,have={},c={};S.tx.forEach(x=>{have[k(x)]=(have[k(x)]||0)+1});fresh=list.filter(x=>{const q=k(x);c[q]=(c[q]||0)+1;return c[q]>(have[q]||0)})}
   S.tx.push(...fresh);if(fresh.length)S.m=fresh.map(x=>x.d.slice(0,7)).sort().pop();if(S.start&&fresh.length){const mn=fresh.map(x=>x.d.slice(0,7)).sort()[0];if(mn<S.start)S.start=mn}
-  save();render();
+  save();render();return fresh.length;
 }
 
 $("imp").onclick=()=>$("file").click();
-$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{addTx(parseCSV(t));e.target.value=""})};
+function toast(m){let t=$("toast");if(!t){t=document.createElement("div");t.id="toast";t.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111c;color:#fff;backdrop-filter:blur(8px);border:1px solid #fff4;padding:10px 16px;border-radius:12px;z-index:99;font-size:.9rem;max-width:90vw;text-align:center";document.body.appendChild(t)}t.textContent=m;t.style.display="block";clearTimeout(t._t);t._t=setTimeout(()=>t.style.display="none",5000)}
+function parseHist(t){const ls=t.split(/\r?\n/).filter(l=>l.trim()),d=(ls[0].match(/;/g)||[]).length>(ls[0].match(/,/g)||[]).length?";":",";let n=0;
+  ls.slice(1).forEach(l=>{const c=splitLine(l,d);let m=(c[0]||"").match(/^(\d{4})-(\d{1,2})/);if(!m){const q=(c[0]||"").match(/^(\d{1,2})[\/.-](\d{4})/);if(q)m=[0,q[2],q[1]]}if(!m)return;const k=m[1]+"-"+String(m[2]).padStart(2,"0"),i=num(c[1]),v=num(c[2]);if(isNaN(i)||isNaN(v))return;S.sum[k]={inc:i,sp:v};if(S.start&&k<S.start)S.start=k;n++});save();render();return n}
+$("file").onchange=async e=>{let a=0,d=0,h=0,bad=0;for(const f of e.target.files){const t=await f.text(),hd=(t.split(/\r?\n/)[0]||"").toLowerCase();
+  if(/mese|month/.test(hd)&&/entrat|income/.test(hd)&&/spes|usc|spend/.test(hd))h+=parseHist(t);
+  else{const l=parseCSV(t),n=addTx(l,true)||0;a+=n;bad+=BAD;d+=l.length-n-BAD}}
+  e.target.value="";toast(L(`Imported ${a} new, ${d} duplicates skipped`+(bad?`, ${bad} invalid rows discarded`:"")+(h?`, ${h} months of history`:""),`Importati ${a} nuovi, ${d} doppioni saltati`+(bad?`, ${bad} righe non valide scartate`:"")+(h?`, ${h} mesi di storico`:"")))};
 $("month").onchange=e=>{S.m=e.target.value;render()};
+function addMonth(v){if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(v||""))return;if(!months().includes(v)&&!S.sum[v])S.sum[v]={inc:0,sp:0};if(S.start&&v<S.start)S.start=v;S.m=v;save();render()}
+$("addm").onclick=()=>{const m=$("mpick");if(m.type!=="month")return addMonth((prompt(L("Month (YYYY-MM):","Mese (AAAA-MM):"))||"").trim());m.value=S.m||"";m.showPicker?m.showPicker():m.click()};
+$("mpick").onchange=e=>addMonth(e.target.value);
+$("delm").onclick=()=>{const m=S.m;if(!m)return;const n=S.tx.filter(x=>x.d.startsWith(m)).length,nm=$("month").selectedOptions[0]?$("month").selectedOptions[0].text:m;
+  if(!confirm(L(`Delete ${nm}${n?` and its ${n} transactions`:""}, including balances and totals? This cannot be undone.`,`Eliminare ${nm}${n?` e i suoi ${n} movimenti`:""}, compresi saldi e totali? L'operazione non si può annullare.`)))return;
+  S.tx=S.tx.filter(x=>!x.d.startsWith(m));delete S.bal[m];delete S.sum[m];S.m=months().pop();save();render()};
 $("nb").onclick=()=>{const d=$("nd").value,t=$("nt").value.trim(),a=ev($("na").value);if(!d||!t||isNaN(a))return;addTx([{id:Date.now()+"",d,t,a}]);$("nt").value="";$("na").value=""};
 $("demo").onclick=()=>{
   const now=new Date(),out=[];
@@ -300,9 +325,32 @@ $("demo").onclick=()=>{
   }
   addTx(out);
 };
-$("exp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:"application/json"}));a.download="budget-backup.json";a.click()};
+function b64(u){let s="";u.forEach(c=>s+=String.fromCharCode(c));return btoa(s)}function ub(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
+async function ckey(p,salt){const m=await crypto.subtle.importKey("raw",new TextEncoder().encode(p),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:600000,hash:"SHA-256"},m,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
+async function enc(txt,p){const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},await ckey(p,salt),new TextEncoder().encode(txt)));return JSON.stringify({budgetEnc:1,s:b64(salt),i:b64(iv),d:b64(ct)})}
+async function dec(o,p){return new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:ub(o.i)},await ckey(p,ub(o.s)),ub(o.d)))}
+$("exp").onclick=async()=>{const p=prompt(L("Passphrase to encrypt the backup (empty = plain file). If you lose it, the backup cannot be recovered.","Password per cifrare il backup (vuoto = file in chiaro). Se la perdi, il backup non è recuperabile."));if(p===null)return;
+  S.bk=Date.now();save();let j=JSON.stringify(S);if(p){if(!window.crypto||!crypto.subtle)return alert(L("Encryption not available in this browser","Cifratura non disponibile in questo browser"));j=await enc(j,p)}
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([j],{type:"application/json"}));a.download=p?"budget-backup-enc.json":"budget-backup.json";a.click()};
 $("imd").onclick=()=>$("fj").click();
-$("fj").onchange=e=>{const f=e.target.files[0];if(f)f.text().then(t=>{try{S=Object.assign(S,JSON.parse(t));save();render()}catch(x){alert(L("Invalid file","File non valido"))}});e.target.value=""};
+$("fj").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{let o=JSON.parse(await f.text());if(o.budgetEnc){const p=prompt(L("Passphrase:","Password:"));if(!p)return;o=JSON.parse(await dec(o,p))}S=Object.assign(S,o);const bad=clean();save();render();toast(L("Data restored","Dati ripristinati")+(bad?L(`; ${bad} invalid transactions discarded`,`; ${bad} movimenti non validi scartati`):""))}catch(x){alert(L("Invalid file or wrong passphrase","File non valido o password errata"))}};
+let LT;function arm(){clearTimeout(LT);if(KEY)LT=setTimeout(()=>location.reload(),3e5)}
+["pointerdown","keydown","scroll"].forEach(v=>addEventListener(v,()=>{if(KEY)arm()},{passive:true}));
+function pwLabel(){$("pw").textContent=KEY?"Rimuovi password":"Proteggi con password";applyLang()}
+$("pw").onclick=async()=>{if(!window.crypto||!crypto.subtle)return alert(L("Encryption not available in this browser","Cifratura non disponibile in questo browser"));
+  if(KEY){if(!confirm(L("Remove password protection? Data will be stored unencrypted.","Rimuovere la protezione? I dati saranno salvati in chiaro.")))return;KEY=null;SALT=null;localStorage.removeItem(LSE);save();pwLabel();return}
+  const a=prompt(L("Choose a password. If you forget it the data cannot be recovered, so keep a backup.","Scegli una password. Se la dimentichi i dati non sono recuperabili: tieni un backup."));if(!a)return;
+  if(prompt(L("Repeat the password:","Ripeti la password:"))!==a)return alert(L("Passwords do not match","Le password non coincidono"));
+  SALT=crypto.getRandomValues(new Uint8Array(16));KEY=await ckey(a,SALT);await encSave();localStorage.removeItem(LS);pwLabel();arm();toast(L("Protection on: data is now encrypted","Protezione attiva: i dati sono cifrati"))};
+$("lk").onclick=()=>{if(!KEY)return toast(L("Set a password first","Imposta prima una password"));location.reload()};
+$("pv").onclick=()=>{S.priv=!S.priv;save();render();toast(S.priv?L("Amounts hidden","Importi nascosti"):L("Amounts visible","Importi visibili"))};
+function showLock(){const o=document.createElement("div");o.id="lock";o.style.cssText="position:fixed;inset:0;z-index:999;background:#0b0d14;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:system-ui,sans-serif";
+  o.innerHTML='<div style="font-size:1.4rem">🔒 budget</div><input id="lkp" type="password" autocomplete="current-password" placeholder="Password" style="padding:12px 16px;border-radius:12px;border:1px solid #fff4;background:#fff1;color:#fff;font-size:1rem;width:min(280px,80vw)"><button id="lkb" style="padding:10px 22px;border-radius:12px;border:0;background:#7c9cff;color:#000;font-weight:600;font-size:1rem">Sblocca / Unlock</button><div id="lke" style="color:#ff8a8a;min-height:1.2em"></div>';document.body.appendChild(o);
+  const go=async()=>{try{const b=JSON.parse(localStorage.getItem(LSE)),sl=ub(b.s),k=await ckey($("lkp").value,sl),t=new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:ub(b.i)},k,ub(b.d)));
+    S=Object.assign(S,JSON.parse(t));clean();KEY=k;SALT=sl;LOCKED=false;o.remove();setTheme(S.theme||"nebula");$("lang").value=S.lang||"en";pwLabel();render();arm()}catch(e){$("lke").textContent="Password errata / Wrong password"}};
+  $("lkb").onclick=go;$("lkp").onkeydown=e=>{if(e.key==="Enter")go()};$("lkp").focus()}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(x){}
+if(S.tx.length&&Date.now()-(S.bk||0)>30*864e5)setTimeout(()=>toast(L("Last backup: over 30 days ago. Data → Export data","Ultimo backup: oltre 30 giorni fa. Dati → Esporta dati")),1500);
 function moveAcc(f,t){if(f===t||t<0||t>=S.acc.length)return;const o=S.acc.map((_,i)=>i);o.splice(t,0,o.splice(f,1)[0]);S.acc=o.map(i=>S.acc[i]);Object.keys(S.bal).forEach(k=>{const n={};o.forEach((old,nw)=>{if(S.bal[k][old]!==undefined)n[nw]=S.bal[k][old]});S.bal[k]=n});save();render()}
 function moveGoal(f,t){if(f===t||t<0||t>=S.goals.length)return;S.goals.splice(t,0,S.goals.splice(f,1)[0]);save();render()}
 function dnd(){[["ah","ar",moveAcc,"a"],["gh","gr",moveGoal,"g"]].forEach(([h,r,fn,p])=>{
@@ -401,6 +449,7 @@ addEventListener("keydown",e=>{if((e.key==="k"&&(e.metaKey||e.ctrlKey))||(e.key=
 $("src").href=SOURCE_URL;S.lang=S.lang||"en";$("lang").value=S.lang;$("lang").onchange=e=>{S.lang=e.target.value;save();render()};
 setTheme(S.theme||(matchMedia("(prefers-color-scheme: light)").matches?"carta":"nebula"));
 render();
+if(LOCKED)showLock();
 </script>
 </body>
 </html>
