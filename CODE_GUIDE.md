@@ -28,6 +28,7 @@ JavaScript fills the containers.
 - **Rendering**: `render()` rebuilds all panels with template strings (`innerHTML`) and re-attaches the handlers;
   `nwRender()`, `lvlRender()` and `dnd()` are called at its end. Simple and predictable; if the app grows a lot,
   this is the part to replace with a small framework.
+- **Bank import**: `BK` lists the banks (Intesa, Fineco, Revolut): the header names that identify each one and how to read a row. `bankTable()` finds the header in the first 30 rows; `xlsxSheets()` reads .xlsx with the browser's own unzip (`DecompressionStream`) and `DOMParser`, so there is no library and the strict CSP stays as is; `pairTransfers()` marks matching out/in amounts between different banks as transfers. To add a bank, add one object to `BK`. Anything not recognized falls back to the generic `parseCSV()`.
 - **Input**: `parseCSV()` reads bank CSVs, `addTx()` adds transactions and skips duplicates (same date, description,
   amount). `ev()` is a safe calculator (recursive descent, no `eval`) used by every numeric field and by the commands.
 - **Drag and drop**: `moveAcc()` also remaps the saved balances when accounts change order; `moveGoal()` reorders buckets;

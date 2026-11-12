@@ -118,8 +118,8 @@ option:checked{background-color:var(--acc);color:var(--bg)}
 </head>
 <body>
 <header class="bar"><span class="logo">budget</span><div class="r"><select id="month" aria-label="Mese"></select><button id="addm" title="Aggiungi mese" aria-label="Aggiungi mese">+</button><button id="delm" title="Elimina mese" aria-label="Elimina mese">−</button><input type="month" id="mpick" tabindex="-1" aria-hidden="true" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none">
-<details class="menu"><summary>Dati</summary><div><select id="lang" aria-label="Language / Lingua"><option value="en">English</option><option value="it">Italiano</option></select><select id="theme" aria-label="Tema"><option value="nebula">Tema Nebula</option><option value="terminal">Tema Terminal</option><option value="aurora">Tema Aurora</option><option value="foresta">Tema Foresta</option><option value="voxel">Tema Voxel</option><option value="synthwave">Tema Synthwave</option><option value="carta">Tema Carta</option></select><button class="p" id="imp">Importa CSV</button><button id="demo">Dati di esempio</button><button id="exp">Esporta dati</button><button id="imd">Importa dati</button><button id="pw">Proteggi con password</button><button id="lk">Blocca ora</button><button id="pv">Nascondi importi</button><button id="fresh">Ricomincia da zero</button><a id="src" class="srcl" target="_blank" rel="noopener">Codice sorgente (AGPL-3.0)</a></div></details></div>
-<input type="file" id="file" accept=".csv,text/csv" multiple hidden><input type="file" id="fj" accept=".json" hidden></header>
+<details class="menu"><summary>Dati</summary><div><select id="lang" aria-label="Language / Lingua"><option value="en">English</option><option value="it">Italiano</option></select><select id="theme" aria-label="Tema"><option value="nebula">Tema Nebula</option><option value="terminal">Tema Terminal</option><option value="aurora">Tema Aurora</option><option value="foresta">Tema Foresta</option><option value="voxel">Tema Voxel</option><option value="synthwave">Tema Synthwave</option><option value="carta">Tema Carta</option></select><button class="p" id="imp">Importa CSV / Excel</button><button id="demo">Dati di esempio</button><button id="exp">Esporta dati</button><button id="imd">Importa dati</button><button id="pw">Proteggi con password</button><button id="lk">Blocca ora</button><button id="pv">Nascondi importi</button><button id="fresh">Ricomincia da zero</button><a id="src" class="srcl" target="_blank" rel="noopener">Codice sorgente (AGPL-3.0)</a></div></details></div>
+<input type="file" id="file" accept=".csv,.xlsx,text/csv" multiple hidden><input type="file" id="fj" accept=".json" hidden></header>
 <nav class="dots" aria-label="Sezioni"><a href="#s1" aria-label="Oggi"></a><a href="#s2" aria-label="Entrate e spese"></a><a href="#s3" aria-label="Dove sono i soldi"></a><a href="#s4" aria-label="Cassetti"></a><a href="#s5" aria-label="Chiusura del mese"></a><a href="#s6" aria-label="Movimenti"></a><a href="#s7" aria-label="Livello"></a></nav>
 <main>
 <section class="scene" id="s1"><div id="hero"></div></section>
@@ -151,7 +151,7 @@ let KEY=null,SALT=null,LOCKED=false,SQ=0,BAD=0;
 try{if(localStorage.getItem(LS+"_enc"))LOCKED=true;else{const r=localStorage.getItem(LS);if(r)S=Object.assign(S,JSON.parse(r));clean()}}catch(e){}
 const L=(e,i)=>S.lang==="it"?i:e;
 const LOC=()=>S.lang==="it"?"it-IT":"en-GB";
-const EN={"Elimina mese":"Delete month","Aggiungi mese":"Add month","Elimina movimento":"Delete transaction","Proteggi con password":"Protect with password","Rimuovi password":"Remove password","Blocca ora":"Lock now","Nascondi importi":"Hide amounts","Dati":"Data","Dati di esempio":"Sample data","Importa CSV":"Import CSV","Esporta dati":"Export data","Importa dati":"Import data","Tema Nebula":"Nebula theme","Tema Terminal":"Terminal theme","Tema Aurora":"Aurora theme","Tema Foresta":"Forest theme","Tema Voxel":"Voxel theme","Tema Synthwave":"Synthwave theme","Tema Carta":"Paper theme","Entrate e spese":"Income & spending","Dove sono i soldi":"Where your money is","Cassetti":"Buckets","Chiusura del mese":"Month close","Dettaglio spese":"Spending details","Livello":"Level","delle entrate speso":"of income spent","Entrate":"Income","Uscite":"Spending","Risparmio":"Savings","Conta gli investimenti come spesa":"Count investments as spending","Aggiungi movimento":"Add transaction","Aggiungi conto":"Add account","Aggiungi cassetto":"Add bucket","Elimina":"Delete","Messo da parte":"Saved","Patrimonio":"Net worth","Rispetto al mese prima":"vs previous month","Barra chiara: entrate. Barra colorata: spese, con la percentuale sulle entrate.":"Light bar: income. Colored bar: spending, with its % of income.","Nessuna spesa da mostrare.":"No spending to show.","Inserisci i saldi di questo mese per vedere come cambia il patrimonio.":"Enter this month's balances to see how your net worth changes.","Liquidità":"Cash","Deposito":"Deposit","Investimenti":"Investments","Fondo pensione":"Pension fund","Altro":"Other","Giroconto":"Transfer","Casa":"Home","Spesa":"Groceries","Trasporti":"Transport","Ristoranti":"Dining","Abbonamenti":"Subscriptions","Novizio":"Rookie","Risparmiatore":"Saver","Stratega":"Strategist","Architetto":"Architect","Maestro":"Master","Leggenda":"Legend","Prima chiusura":"First close","Hai chiuso un mese con i saldi":"You closed a month with balances","Sotto soglia":"Under threshold","Un mese sotto la soglia di spesa":"One month under your spending threshold","Serie da 3":"3-month streak","3 mesi di fila sotto soglia":"3 months in a row under threshold","Risparmio 40%":"40% saved","Un mese con almeno il 40% risparmiato":"A month with at least 40% saved","Mezzo cassetto":"Half a bucket","Un cassetto a metà strada":"A bucket halfway full","Cassetto pieno":"Bucket full","Un cassetto completato":"A completed bucket","Patrimonio +10%":"Net worth +10%","Patrimonio cresciuto del 10%":"Net worth grew by 10%","Andamento del patrimonio":"Net worth trend","Apri la riga di comando":"Open command line","Avanzamento livello":"Level progress","Categoria":"Category","Data":"Date","Descrizione":"Description","Importo":"Amount","Importo o calcolo (− uscita)":"Amount or calculation (− for spending)","Mese":"Month","Nome cassetto":"Bucket name","Nome conto":"Account name","Oggi":"Today","Riga di comando":"Command line","Ripartizione del patrimonio":"Net worth breakdown","Sezioni":"Sections","Tema":"Theme","Tipo conto":"Account type","Uscite del mese":"Month's spending","Entrate del mese":"Month's income","Entrate e spese per mese":"Income and spending by month","Soglia di spesa (% delle entrate)":"Spending threshold (% of income)","Soglia di spesa":"Spending threshold","Codice sorgente (AGPL-3.0)":"Source code (AGPL-3.0)","Movimenti":"Transactions","Spese per categoria":"Spending by category","Tutti i movimenti":"All transactions","Ricomincia da zero":"Start from scratch","Sposta (trascina o usa le frecce su/giù)":"Move (drag, or use the up/down arrows)"};
+const EN={"Elimina mese":"Delete month","Aggiungi mese":"Add month","Elimina movimento":"Delete transaction","Proteggi con password":"Protect with password","Rimuovi password":"Remove password","Blocca ora":"Lock now","Nascondi importi":"Hide amounts","Dati":"Data","Dati di esempio":"Sample data","Importa CSV / Excel":"Import CSV / Excel","Esporta dati":"Export data","Importa dati":"Import data","Tema Nebula":"Nebula theme","Tema Terminal":"Terminal theme","Tema Aurora":"Aurora theme","Tema Foresta":"Forest theme","Tema Voxel":"Voxel theme","Tema Synthwave":"Synthwave theme","Tema Carta":"Paper theme","Entrate e spese":"Income & spending","Dove sono i soldi":"Where your money is","Cassetti":"Buckets","Chiusura del mese":"Month close","Dettaglio spese":"Spending details","Livello":"Level","delle entrate speso":"of income spent","Entrate":"Income","Uscite":"Spending","Risparmio":"Savings","Conta gli investimenti come spesa":"Count investments as spending","Aggiungi movimento":"Add transaction","Aggiungi conto":"Add account","Aggiungi cassetto":"Add bucket","Elimina":"Delete","Messo da parte":"Saved","Patrimonio":"Net worth","Rispetto al mese prima":"vs previous month","Barra chiara: entrate. Barra colorata: spese, con la percentuale sulle entrate.":"Light bar: income. Colored bar: spending, with its % of income.","Nessuna spesa da mostrare.":"No spending to show.","Inserisci i saldi di questo mese per vedere come cambia il patrimonio.":"Enter this month's balances to see how your net worth changes.","Liquidità":"Cash","Deposito":"Deposit","Investimenti":"Investments","Fondo pensione":"Pension fund","Altro":"Other","Giroconto":"Transfer","Casa":"Home","Spesa":"Groceries","Trasporti":"Transport","Ristoranti":"Dining","Abbonamenti":"Subscriptions","Novizio":"Rookie","Risparmiatore":"Saver","Stratega":"Strategist","Architetto":"Architect","Maestro":"Master","Leggenda":"Legend","Prima chiusura":"First close","Hai chiuso un mese con i saldi":"You closed a month with balances","Sotto soglia":"Under threshold","Un mese sotto la soglia di spesa":"One month under your spending threshold","Serie da 3":"3-month streak","3 mesi di fila sotto soglia":"3 months in a row under threshold","Risparmio 40%":"40% saved","Un mese con almeno il 40% risparmiato":"A month with at least 40% saved","Mezzo cassetto":"Half a bucket","Un cassetto a metà strada":"A bucket halfway full","Cassetto pieno":"Bucket full","Un cassetto completato":"A completed bucket","Patrimonio +10%":"Net worth +10%","Patrimonio cresciuto del 10%":"Net worth grew by 10%","Andamento del patrimonio":"Net worth trend","Apri la riga di comando":"Open command line","Avanzamento livello":"Level progress","Categoria":"Category","Data":"Date","Descrizione":"Description","Importo":"Amount","Importo o calcolo (− uscita)":"Amount or calculation (− for spending)","Mese":"Month","Nome cassetto":"Bucket name","Nome conto":"Account name","Oggi":"Today","Riga di comando":"Command line","Ripartizione del patrimonio":"Net worth breakdown","Sezioni":"Sections","Tema":"Theme","Tipo conto":"Account type","Uscite del mese":"Month's spending","Entrate del mese":"Month's income","Entrate e spese per mese":"Income and spending by month","Soglia di spesa (% delle entrate)":"Spending threshold (% of income)","Soglia di spesa":"Spending threshold","Codice sorgente (AGPL-3.0)":"Source code (AGPL-3.0)","Movimenti":"Transactions","Spese per categoria":"Spending by category","Tutti i movimenti":"All transactions","Ricomincia da zero":"Start from scratch","Sposta (trascina o usa le frecce su/giù)":"Move (drag, or use the up/down arrows)"};
 const RX=[[/Nessun dato per questo mese\. Inserisci entrate e uscite in «Chiusura del mese», importa un CSV o carica i dati di esempio\./,"No data for this month. Enter income and spending in “Month close”, import a CSV or load the sample data."],[/Inserisci i saldi dei conti in «Chiusura del mese» per vedere come è distribuito il patrimonio\./,"Enter your account balances in “Month close” to see how your net worth is distributed."],[/Entrate e uscite del mese \(usate se non importi i movimenti\)\. Nei campi numerici puoi scrivere calcoli, ad esempio 1200\/12\+30\./,"Month's income and spending (used if you don't import transactions). Numeric fields accept calculations, e.g. 1200/12+30."],[/Soglia (\d+)%\./,"Threshold $1%."],[/Sei dentro la soglia\./,"You are within the threshold."],[/Hai superato la soglia di (\d+) punti\./,"You are $1 points over the threshold."],[/Servono delle entrate nel mese\./,"Income is needed for this month."],[/In media spendi il (\d+)% di quanto entra/,"On average you spend $1% of what comes in"],[/e metti da parte (.+?) al mese \((\d+) mesi con dati\)\./,"and set aside $1 a month ($2 months of data)."],[/Rispetto ai mesi precedenti il rapporto spese\/entrate è (migliorato|peggiorato) di (\d+) punti\./,(m,a,b)=>`Compared with earlier months, your spending/income ratio has ${a==="migliorato"?"improved":"worsened"} by ${b} points.`],[/Saldi a fine mese \((.+)\)/,"End-of-month balances ($1)"],[/Saldi di (.+)/,"Balances for $1"],[/(\d+)% · mancano (.+)/,"$1% · $2 to go"],[/Risparmio del mese (.+?); il resto \((.+?)\) viene da rendimenti, cambi di valore o movimenti non registrati\./,"Savings this month $1; the rest ($2) comes from returns, value changes or unrecorded transactions."],[/Stai costruendo valore:/,"You're building value:"],[/Il patrimonio sta calando:/,"Your net worth is shrinking:"],[/da (.+) è passato da (.+) a (.+) \((.+)\)\./,"from $1 it went from $2 to $3 ($4)."],[/(\d+) XP · (\d+) al livello (\d+)/,"$1 XP · $2 to level $3"],[/Serie attuale: (\d+) (?:mese|mesi) sotto soglia \(record (\d+)\)\./,"Current streak: $1 month(s) under threshold (best $2)."],[/Elimina (cassetto|conto) (.+)/,(m,a,b)=>`Delete ${a==="conto"?"account":"bucket"} ${b}`],[/Saldo di (.+)/,"Balance of $1"],[/Spendi il (.+?)% delle entrate, soglia (\d+)%/,"You spend $1% of income, threshold $2%"]];
 function tr(s){const k=s.trim();if(EN[k])return s.replace(k,EN[k]);if(k.endsWith(" · da sbloccare"))return s.replace(k,tr(k.slice(0,-15))+" · locked");let o=s;for(const[r,v]of RX)o=o.replace(r,v);return o}
 function applyLang(){
@@ -303,10 +303,86 @@ $("imp").onclick=()=>$("file").click();
 function toast(m){let t=$("toast");if(!t){t=document.createElement("div");t.id="toast";t.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111c;color:#fff;backdrop-filter:blur(8px);border:1px solid #fff4;padding:10px 16px;border-radius:12px;z-index:99;font-size:.9rem;max-width:90vw;text-align:center";document.body.appendChild(t)}t.textContent=m;t.style.display="block";clearTimeout(t._t);t._t=setTimeout(()=>t.style.display="none",5000)}
 function parseHist(t){const ls=t.split(/\r?\n/).filter(l=>l.trim()),d=(ls[0].match(/;/g)||[]).length>(ls[0].match(/,/g)||[]).length?";":",";let n=0;
   ls.slice(1).forEach(l=>{const c=splitLine(l,d);let m=(c[0]||"").match(/^(\d{4})-(\d{1,2})/);if(!m){const q=(c[0]||"").match(/^(\d{1,2})[\/.-](\d{4})/);if(q)m=[0,q[2],q[1]]}if(!m)return;const k=m[1]+"-"+String(m[2]).padStart(2,"0"),i=num(c[1]),v=num(c[2]);if(isNaN(i)||isNaN(v))return;S.sum[k]={inc:i,sp:v};if(S.start&&k<S.start)S.start=k;n++});save();render();return n}
-$("file").onchange=async e=>{let a=0,d=0,h=0,bad=0;for(const f of e.target.files){const t=await f.text(),hd=(t.split(/\r?\n/)[0]||"").toLowerCase();
-  if(/mese|month/.test(hd)&&/entrat|income/.test(hd)&&/spes|usc|spend/.test(hd))h+=parseHist(t);
-  else{const l=parseCSV(t),n=addTx(l,true)||0;a+=n;bad+=BAD;d+=l.length-n-BAD}}
-  e.target.value="";toast(L(`Imported ${a} new, ${d} duplicates skipped`+(bad?`, ${bad} invalid rows discarded`:"")+(h?`, ${h} months of history`:""),`Importati ${a} nuovi, ${d} doppioni saltati`+(bad?`, ${bad} righe non valide scartate`:"")+(h?`, ${h} mesi di storico`:"")))};
+/* ===== Bank import: Intesa, Fineco, Revolut (.xlsx and .csv). No dependencies: xlsx is read with the browser's own unzip. ===== */
+const nk=s=>String(s==null?"":s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9/]+/g," ").trim();
+const nv=v=>typeof v==="number"?v:num(v==null?"":v);
+const dv=v=>typeof v==="number"?new Date(Math.round((v-25569)*864e5)).toISOString().slice(0,10):dt(String(v==null?"":v).trim());
+async function unzipX(buf){
+  const u=new Uint8Array(buf),v=new DataView(buf);let e=u.length-22;
+  while(e>=0&&v.getUint32(e,true)!==0x06054b50)e--;if(e<0)throw new Error("zip");
+  const n=v.getUint16(e+10,true),F={};let p=v.getUint32(e+16,true);
+  for(let i=0;i<n;i++){const nl=v.getUint16(p+28,true);
+    F[new TextDecoder().decode(u.subarray(p+46,p+46+nl))]={m:v.getUint16(p+10,true),c:v.getUint32(p+20,true),o:v.getUint32(p+42,true)};
+    p+=46+nl+v.getUint16(p+30,true)+v.getUint16(p+32,true)}
+  const get=async k=>{const f=F[k];if(!f)return null;const o=f.o,b=o+30+v.getUint16(o+26,true)+v.getUint16(o+28,true),z=u.subarray(b,b+f.c);
+    if(f.m===0)return new TextDecoder().decode(z);
+    const ds=new DecompressionStream("deflate-raw"),w=ds.writable.getWriter();w.write(z);w.close();
+    return new TextDecoder().decode(await new Response(ds.readable).arrayBuffer())};
+  return{get,names:Object.keys(F)};
+}
+async function xlsxSheets(buf){
+  const z=await unzipX(buf),px=new DOMParser(),X=t=>px.parseFromString(t,"application/xml"),ss=[],st=await z.get("xl/sharedStrings.xml");
+  if(st)X(st).querySelectorAll("si").forEach(si=>ss.push([...si.querySelectorAll("t")].map(t=>t.textContent).join("")));
+  const out=[],nn=k=>+k.match(/(\d+)\.xml$/)[1];
+  for(const k of z.names.filter(k=>/^xl\/worksheets\/sheet\d+\.xml$/.test(k)).sort((a,b)=>nn(a)-nn(b))){
+    const rows=[];
+    X(await z.get(k)).querySelectorAll("row").forEach(r=>{const row=[];
+      r.querySelectorAll("c").forEach(c=>{
+        const ref=c.getAttribute("r"),ci=ref?[...ref.replace(/\d/g,"")].reduce((q,ch)=>q*26+ch.charCodeAt(0)-64,0)-1:row.length,t=c.getAttribute("t"),v=c.querySelector("v");
+        row[ci]=t==="s"?(v?ss[+v.textContent]:null):t==="inlineStr"?[...c.querySelectorAll("t")].map(x=>x.textContent).join(""):v?(t==="str"||t==="e"||t==="b"?v.textContent:+v.textContent):null});
+      rows.push(row)});
+    out.push(rows)}
+  return out;
+}
+function csvRows(t){const ls=t.split(/\r?\n/).filter(l=>l.trim()),s=ls.slice(0,30).join("\n"),d=(s.match(/;/g)||[]).length>(s.match(/,/g)||[]).length?";":",";return ls.map(l=>splitLine(l,d))}
+/* A bank = the header names that identify it + how to read one row. The header may be on any of the first 30 rows. */
+const BK=[
+ {id:"Intesa",need:["data","operazione","dettagli","importo"],
+  f:(r,h)=>({d:r[h["data"]],t:[r[h["operazione"]],r[h["dettagli"]]].filter(Boolean).join(" — "),a:r[h["importo"]]})},
+ {id:"Fineco",need:["data operazione","entrate","uscite","descrizione"],
+  f:(r,h)=>{const e=nv(r[h["entrate"]]),u=nv(r[h["uscite"]]),b=r[h["descrizione"]],c=r[h["descrizione completa"]],st=r[h["stato"]];
+    return{d:r[h["data operazione"]],t:c&&String(c).includes(String(b||""))?c:[b,c].filter(Boolean).join(" — "),
+      a:isNaN(e)&&isNaN(u)?NaN:(isNaN(e)?0:Math.abs(e))-(isNaN(u)?0:Math.abs(u)),
+      p:st!=null&&nk(st)!=="contabilizzato"}}}, /* only booked items are imported; the others come with the next export */
+ {id:"Revolut",need:["date","description","money in/out"],
+  f:(r,h)=>({d:r[h["date"]],t:r[h["description"]],a:r[h["money in/out"]]})}
+];
+function bankTable(rows){
+  for(let i=0;i<Math.min(rows.length,30);i++){
+    const h={};(rows[i]||[]).forEach((c,j)=>{const k=nk(c);if(k&&!(k in h))h[k]=j});
+    const b=BK.find(b=>b.need.every(k=>k in h));if(!b)continue;
+    const list=[];let pend=0,bad=0;
+    rows.slice(i+1).forEach(r=>{if(!r||!r.some(c=>c!=null&&c!==""))return;
+      const x=b.f(r,h),d=dv(x.d),a=nv(x.a);
+      if(!d||isNaN(a)){bad++;return}
+      if(x.p){pend++;return}
+      list.push({id:Math.random().toString(36).slice(2),d,t:String(x.t==null?"":x.t).replace(/\s+/g," ").trim(),a,_b:b.id})});
+    return{bank:b.id,list,pend,bad}}
+  return null}
+async function bankOf(f,t){
+  if(t!=null)return bankTable(csvRows(t));
+  let sh;try{sh=await xlsxSheets(await f.arrayBuffer())}catch(e){return null}
+  for(const s of sh){const r=bankTable(s);if(r)return r}return null}
+/* same amount out of one bank and into another within 2 days = transfer between your own accounts (you can change it from the category menu) */
+function pairTransfers(l,days){let n=0;const D=x=>Date.parse(x.d+"T00:00:00Z")/864e5;
+  l.filter(x=>x.a<0&&!x.c).forEach(o=>{const m=l.find(i=>i.a>0&&!i.c&&i._b!==o._b&&Math.abs(i.a+o.a)<.005&&Math.abs(D(i)-D(o))<=days);if(m){o.c=m.c="Giroconto";n++}});
+  l.forEach(x=>delete x._b);return n}
+$("file").onchange=async e=>{let a=0,d=0,h=0,bad=0,pend=0,unk=0,tf=0;const nb=[],bl=[];
+  for(const f of e.target.files){const isX=/\.xlsx$/i.test(f.name),t=isX?null:await f.text(),r=await bankOf(f,t);
+    if(r){
+      if(r.bank==="Revolut"){const c0=prompt(L("Currency of this Revolut file (EUR if unsure):","Valuta di questo file Revolut (EUR se incerto):"),"EUR");if(c0===null)continue;
+        const cu=(c0||"EUR").trim().toUpperCase();
+        if(cu!=="EUR"){const fx=num(prompt(L(`1 ${cu} = how many EUR?`,`1 ${cu} = quanti EUR?`),"")||"");if(!(fx>0))continue;
+          r.list.forEach(x=>{x.t=(x.t+` (${x.a.toFixed(2)} ${cu})`).slice(0,200);x.a=Math.round(x.a*fx*100)/100})}}
+      bl.push(...r.list);nb.push(r.bank+" "+r.list.length);pend+=r.pend;bad+=r.bad;continue}
+    if(isX){unk++;continue}
+    const hd=(t.split(/\r?\n/)[0]||"").toLowerCase();
+    if(/mese|month/.test(hd)&&/entrat|income/.test(hd)&&/spes|usc|spend/.test(hd))h+=parseHist(t);
+    else{const l=parseCSV(t),n=addTx(l,true)||0;a+=n;bad+=BAD;d+=l.length-n-BAD}}
+  if(bl.length){tf=pairTransfers(bl,2);const n=addTx(bl,true)||0;a+=n;bad+=BAD;d+=bl.length-n-BAD}
+  e.target.value="";const x=nb.length?` (${nb.join(", ")})`:"";
+  toast(L(`Imported ${a} new${x}, ${d} duplicates skipped`+(tf&&a?`, ${tf} transfers detected`:"")+(pend?`, ${pend} pending skipped`:"")+(unk?`, ${unk} unrecognized file(s)`:"")+(bad?`, ${bad} invalid rows discarded`:"")+(h?`, ${h} months of history`:""),
+    `Importati ${a} nuovi${x}, ${d} doppioni saltati`+(tf&&a?`, ${tf} giroconti riconosciuti`:"")+(pend?`, ${pend} in sospeso saltati`:"")+(unk?`, ${unk} file non riconosciuti`:"")+(bad?`, ${bad} righe non valide scartate`:"")+(h?`, ${h} mesi di storico`:"")))};
 $("month").onchange=e=>{S.m=e.target.value;render()};
 function addMonth(v){if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(v||""))return;if(!months().includes(v)&&!S.sum[v])S.sum[v]={inc:0,sp:0};if(S.start&&v<S.start)S.start=v;S.m=v;save();render()}
 $("addm").onclick=()=>{const m=$("mpick");if(m.type!=="month")return addMonth((prompt(L("Month (YYYY-MM):","Mese (AAAA-MM):"))||"").trim());m.value=S.m||"";m.showPicker?m.showPicker():m.click()};
